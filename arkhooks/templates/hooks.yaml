@@ -1,0 +1,52 @@
+{{- range $hookName, $hook := .Values.hooks }}
+{{- if $hook.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ template "arkhooks.fullname" $ }}-{{ $hookName }}"
+  labels:
+    chart: {{ template "arkhooks.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    role: helm-hook
+  annotations:
+    "helm.sh/hook": {{ $hookName }}
+{{- if $hook.weight }}
+    "helm.sh/hook-weight": {{ $hook.weight | quote }}
+{{- end }}
+    "helm.sh/hook-delete-policy": {{ default "hook-succeeded" $hook.deletePolicy }}
+spec:
+  template:
+    metadata:
+      name: "{{ template "arkhooks.fullname" $ }}-{{ $hookName }}"
+      labels:
+        chart: {{ template "arkhooks.chart" $ }}
+        release: {{ $.Release.Name }}
+        heritage: {{ $.Release.Service }}
+        role: helm-hook
+    spec:
+      restartPolicy: Never
+      containers:
+{{- range $i, $action := $hook.actions }}
+      - name: "action-{{ $i }}"
+        image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        command: ["/ark"]
+{{- if $action.presetRef }}
+{{- $actionConfig := (index $.Values "presets" $action.presetRef) }}
+        arguments:
+        - {{ required "command is required" $actionConfig.command | quote }}
+{{- range $actionConfig.arguments }}
+        - {{ tpl . $ | quote }}
+{{- end }}
+{{- else }}
+        arguments:
+        - {{ required "command is required" $action.command | quote }}
+{{- range $action.arguments }}
+        - {{ tpl . $ | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

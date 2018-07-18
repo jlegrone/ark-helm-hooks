@@ -1,0 +1,3 @@
+This chart is meant to be used as a dependency of other helm charts.
+
+For usage instructions, please see https://github.com/jlegrone/ark-helm-hooks.

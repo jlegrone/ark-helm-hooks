@@ -1,0 +1,108 @@
+# Default values for arkhooks.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: gcr.io/heptio-images/ark
+  tag: latest
+  pullPolicy: IfNotPresent
+
+flags:
+  ## resources to include in the backup, formatted as resource.group,
+  ## such as storageclasses.storage.k8s.io (use '*' for all resources)
+  includeResources: '*'
+  ## a cron expression specifying a recurring schedule for this backup to run
+  schedule: 
+
+presets:
+  backupCreate:
+    command: backup
+    arguments: [
+      "create",
+      "helm-{{ .Release.Name }}-v{{ .Release.Revision }}",
+      "--labels", "release={{ .Release.Name }},revision={{ .Release.Revision }},heritage={{ .Release.Service }}",
+      "--include-namespaces", "{{ .Release.Namespace }}",
+      "--include-resources", "{{ .Values.flags.includeResources }}",
+      "--selector", "release={{ .Release.Name }}"
+    ]
+  backupDelete:
+    command: backup
+    arguments: [
+      "delete",
+      "helm-{{ .Release.Name }}-v{{ .Release.Revision }}",
+      "--confirm"
+    ]
+  backupRestore:
+    command: restore
+    arguments: [
+      "create",
+      "--from-backup", "helm-{{ .Release.Name }}-v{{ .Release.Revision }}",
+      "--include-namespaces", "{{ .Release.Namespace }}",
+      "--include-resources", "{{ .Values.flags.includeResources }}",
+      "--selector", "release={{ .Release.Name }}"
+    ]
+  scheduleCreate:
+    command: schedule
+    arguments: [
+      "create",
+      "helm-{{ .Release.Name }}-schedule",
+      "--schedule", "{{ .Values.flags.schedule }}",
+      "--labels", "release={{ .Release.Name }},revision={{ .Release.Revision }},heritage={{ .Release.Service }}",
+      "--include-namespaces", "{{ .Release.Namespace }}",
+      "--include-resources", "{{ .Values.flags.includeResources }}",
+      "--selector", "release={{ .Release.Name }}"
+    ]
+  scheduleDelete:
+    command: schedule
+    arguments: [
+      "delete",
+      "helm-{{ .Release.Name }}-schedule"
+    ]
+
+hooks:
+  pre-install:
+    enabled: false
+    actions: []
+  post-install:
+    enabled: false
+    actions:
+    - presetRef: scheduleCreate
+  pre-delete:
+    enabled: false
+    actions: []
+  post-delete:
+    enabled: false
+    actions:
+    - presetRef: scheduleDelete
+  pre-upgrade:
+    enabled: false
+    actions:
+    - presetRef: backupCreate
+  post-upgrade:
+    enabled: false
+    actions: []
+  pre-rollback:
+    enabled: false
+    actions: []
+  post-rollback:
+    enabled: false
+    actions: []
+    # weight: 5
+    # deletePolicy: 'on-success'
+    # actions:
+    # - command: schedule
+    #   arguments:
+    #   - create
+    #   - '--selector release={{ .Release.Name }}'
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
