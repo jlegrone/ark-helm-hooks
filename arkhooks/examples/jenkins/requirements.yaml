@@ -1,0 +1,7 @@
+dependencies:
+- name: jenkins
+  version: 0.16.6
+  repository: https://kubernetes-charts.storage.googleapis.com
+- name: arkhooks
+  version: 0.1.0
+  repository: "file://../.."

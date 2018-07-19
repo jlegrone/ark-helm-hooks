@@ -15,7 +15,7 @@ metadata:
 {{- if $hook.weight }}
     "helm.sh/hook-weight": {{ $hook.weight | quote }}
 {{- end }}
-    "helm.sh/hook-delete-policy": {{ default "hook-succeeded" $hook.deletePolicy }}
+    "helm.sh/hook-delete-policy": {{ default "before-hook-creation" $hook.deletePolicy }}
 spec:
   template:
     metadata:
@@ -35,13 +35,13 @@ spec:
         command: ["/ark"]
 {{- if $action.presetRef }}
 {{- $actionConfig := (index $.Values "presets" $action.presetRef) }}
-        arguments:
+        args:
         - {{ required "command is required" $actionConfig.command | quote }}
 {{- range $actionConfig.arguments }}
         - {{ tpl . $ | quote }}
 {{- end }}
 {{- else }}
-        arguments:
+        args:
         - {{ required "command is required" $action.command | quote }}
 {{- range $action.arguments }}
         - {{ tpl . $ | quote }}

@@ -1,0 +1,20 @@
+# Default values for jenkins.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+jenkins:
+  Master:
+    UseSecurity: false
+  Persistence:
+    Enabled: true
+
+arkhooks:
+  flags:
+    includeResources: "pvcs,pvs"
+  hooks:
+    post-install:
+      enabled: true
+    post-delete:
+      enabled: true
+    pre-upgrade:
+      enabled: true

@@ -1,0 +1,9 @@
+dependencies:
+- name: jenkins
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 0.16.6
+- name: arkhooks
+  repository: file://../..
+  version: 0.1.0
+digest: sha256:50d7ef33b69ee85dc3332bacdf2e4170061c51392477a1515acb68c74f06f4f4
+generated: 2018-07-19T14:08:37.339755911-04:00
