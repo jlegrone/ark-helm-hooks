@@ -17,6 +17,8 @@ metadata:
 {{- end }}
     "helm.sh/hook-delete-policy": {{ default "before-hook-creation" $hook.deletePolicy }}
 spec:
+  backoffLimit: 6
+  completions: 1
   template:
     metadata:
       name: "{{ template "arkhooks.fullname" $ }}-{{ $hookName }}"
