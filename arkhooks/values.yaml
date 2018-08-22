@@ -86,14 +86,8 @@ hooks:
     actions: []
   post-rollback:
     enabled: false
-    actions: []
-    # weight: 5
-    # deletePolicy: 'on-success'
-    # actions:
-    # - command: schedule
-    #   arguments:
-    #   - create
-    #   - '--selector release={{ .Release.Name }}'
+    actions:
+    - presetRef: backupRestore
 
 ## specify namespace for hook pods to run within
 namespace: "{{ .Release.Namespace }}"

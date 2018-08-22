@@ -18,3 +18,5 @@ arkhooks:
       enabled: true
     pre-upgrade:
       enabled: true
+    post-rollback:
+      enabled: true
