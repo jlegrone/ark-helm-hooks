@@ -49,6 +49,8 @@ spec:
         - {{ tpl . $ | quote }}
 {{- end }}
 {{- end }}
+        resources:
+{{ toYaml $.Values.resources | indent 10 }}
 {{- end }}
 {{- end }}
 {{- end }}
