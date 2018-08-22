@@ -5,6 +5,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: "{{ template "arkhooks.fullname" $ }}-{{ $hookName }}"
+{{- if $.Values.namespace }}
+  namespace: {{ tpl $.Values.namespace $ | quote }}
+{{- end }}
   labels:
     chart: {{ template "arkhooks.chart" $ }}
     release: {{ $.Release.Name }}
@@ -29,6 +32,10 @@ spec:
         role: helm-hook
     spec:
       restartPolicy: Never
+{{- if $.Values.serviceAccountName }}
+      serviceAccountName: {{ tpl $.Values.serviceAccountName $ | quote }}
+{{- end }}
+      automountServiceAccountToken: true
       containers:
 {{- range $i, $action := $hook.actions }}
       - name: "action-{{ $i }}"

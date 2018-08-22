@@ -95,6 +95,11 @@ hooks:
     #   - create
     #   - '--selector release={{ .Release.Name }}'
 
+## specify namespace for hook pods to run within
+namespace: "{{ .Release.Namespace }}"
+## specify a service account for managing ark resources
+serviceAccountName: 
+
 resources:
   limits:
    cpu: 100m
